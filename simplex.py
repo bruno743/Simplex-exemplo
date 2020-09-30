@@ -51,7 +51,8 @@ def print_tablo(matriz, fobjetivo):
     print("Essa é a função objetivo a ser minimizada:")
     print(fobjetivo, "\n")
 
-entrada = open('PPL.txt', 'r').readlines()
+arquivo = input("Qual o arquivo do problema?")  # arquivo .txt com o problema
+entrada = open(arquivo, 'r').readlines()
 matriz = []
 fobjetivo = []
 n = 0
@@ -60,7 +61,7 @@ n = 0
 for line in entrada:
     linhas = []
     for i in line.split(' '):
-        linhas.append(float(i))
+        linhas.append(round(float(i), 2))
     if n <= 0:
         fobjetivo = linhas            # função objetivo
     else:
@@ -77,7 +78,7 @@ if max_min == '1':
 while(question != 'f'):
     nova_base = entra_base(fobjetivo)
     if nova_base < 0:
-        print("Sem mais variáveis candidatas a entra na base.") # solução ótima, ou não há solução
+        print("Sem mais variáveis candidatas a entrar na base.") # solução ótima, ou não há solução
         break
 
     if teste(matriz, nova_base) < 0:
@@ -85,7 +86,6 @@ while(question != 'f'):
         break
     
     troca_de_base(matriz, teste(matriz, nova_base), nova_base, fobjetivo)
-
     print_tablo(matriz, fobjetivo)
 
     question = input("continuar: 's', parar: 'f'.\n") # o usuário pode decidir se a solução é ótima ao ver o tablô
