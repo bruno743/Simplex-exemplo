@@ -4,7 +4,7 @@ def teste(matriz, coluna):
     linha = -1                  # inicializando variável linha
 
     for i in range(len(matriz)):            # inicializando variável com com a razão entre o valor de b[i] e x[i][coluna]
-        if(matriz[i][coluna] != 0):
+        if(matriz[i][coluna] != 0 and matriz[i][len(matriz[0])-1]/matriz[i][coluna] >=0):
             sai_base = matriz[i][len(matriz[0])-1]/matriz[i][coluna]
             break
 
@@ -103,3 +103,5 @@ for i in range(len(fobjetivo)):
 
 if n > len(matriz) and question == 'f': # em caso de solução ótima
     print("\nMúltiplas soluções!")      # se houver uma variável não-básica valendo zero, existem múltiplas soluções
+
+input("Pressione ENTER para encerrar.")
