@@ -9,7 +9,7 @@ def teste(matriz, coluna):
             break
 
     for i in range(len(matriz)):
-        if(matriz[i][coluna] != 0 and matriz[i][len(matriz[0])-1]/matriz[i][coluna] <= sai_base):
+        if(matriz[i][coluna] != 0 and matriz[i][len(matriz[0])-1]/matriz[i][coluna] >=0 and matriz[i][len(matriz[0])-1]/matriz[i][coluna] <= sai_base):
             sai_base = matriz[i][len(matriz[0])-1]/matriz[i][coluna]
             linha = i
     
@@ -31,57 +31,75 @@ def troca_de_base(matriz, linha, coluna, fobjetivo):
                 matriz[i][j] -= matriz[linha][j]*mult
 
 ''' determina qual variável não-básica entrará na base '''
-def entra_base(vetor, m):
-    if m == '0':
-        valor_min = min(vetor[0:len(vetor) - 1], key=float)
-        if (valor_min < 0):
-            return vetor.index(valor_min)       # coluna da variável candidata
-        else:
-            return -1
-    if m == '1':
-        valor_max = max(vetor[0:len(vetor) - 1], key=float)
-        if (valor_max > 0):
-            return vetor.index(valor_max)       # coluna da variável candidata
-        else:
-            return -1
+def entra_base(vetor):
+    valor_min = min(vetor[0:len(vetor) - 1], key=float)
+    if (valor_min < 0):
+        return vetor.index(valor_min)       # coluna da variável candidata
+    else:
+        return -1
+
+def print_tablo(matriz, fobjetivo):
+    print("\nEssa é a matriz:")
+    text = '| '
+    for i in range(len(matriz[0]) - 1):
+        text += 'X{} | '.format(i + 1)
+
+    print(text, 'b ')
+    for i in range(len(matriz)):
+        print('{}'.format(matriz[i]))
+
+    print("Essa é a função objetivo a ser minimizada:")
+    print(fobjetivo, "\n")
 
 entrada = open('PPL.txt', 'r').readlines()
-linhas = []
 matriz = []
 fobjetivo = []
 n = 0
 
 ''' dividindo o arquivo lido em função objetivo e matriz de restrições '''
 for line in entrada:
+    linhas = []
     for i in line.split(' '):
         linhas.append(float(i))
     if n <= 0:
         fobjetivo = linhas            # função objetivo
     else:
         matriz.append(linhas)         # matriz de restrições
-    linhas = []
     n+=1
 
-print("Essa é a matriz:")
-for i in range(len(matriz)):
-    print(matriz[i])
-
-print("Essa é a função objetivo a ser minimizada:")
-print(fobjetivo, "\n")
+print_tablo(matriz, fobjetivo)
 
 question = 's'
-''' aplicando o simplex (+ou-) '''
+''' aplicando o simplex '''
 max_min = input("Digite 1 para maximização e 0 para minimização:\n")
+if max_min == '1':
+    fobjetivo = [i*-1 for i in fobjetivo]   # em caso de MAX Z, múltiplica-se por -1 para fazer MIN Z
 while(question != 'f'):
-    if entra_base(fobjetivo, max_min) < 0:
-        print("Fim!")
+    nova_base = entra_base(fobjetivo)
+    if nova_base < 0:
+        print("Sem mais variáveis candidatas a entra na base.") # solução ótima, ou não há solução
         break
 
-    troca_de_base(matriz, teste(matriz, entra_base(fobjetivo, max_min)), entra_base(fobjetivo, max_min), fobjetivo)
+    if teste(matriz, nova_base) < 0:
+        print("Solução ilimitada!")     # se não é possível uma variável sair da base, solução ilimitada
+        break
+    
+    troca_de_base(matriz, teste(matriz, nova_base), nova_base, fobjetivo)
 
-    for i in range(len(matriz)):
-        print(matriz[i])
+    print_tablo(matriz, fobjetivo)
 
-    print("\n", fobjetivo)
+    question = input("continuar: 's', parar: 'f'.\n") # o usuário pode decidir se a solução é ótima ao ver o tablô
 
-    question = input("continuar: 's', parar: 'f'.\n")
+if question == 'f' and entra_base(fobjetivo) < 0:
+    if max_min == '1':
+        print("Z =", fobjetivo[len(fobjetivo)-1])   # valor de Z ótimo
+    if max_min == '0':
+        print("Z =", fobjetivo[len(fobjetivo)-1]*-1)
+
+n = 0
+for i in range(len(fobjetivo)):
+    if fobjetivo[i] == 0.0:
+        n+=1
+
+if n > len(matriz) and question == 'f': # em caso de solução ótima
+    print("\nMúltiplas soluções!")      # se houver uma variável não-básica valendo zero, existem múltiplas soluções
