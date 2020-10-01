@@ -70,15 +70,27 @@ for line in entrada:
 
 print_tablo(matriz, fobjetivo)
 
-question = 's'
 ''' aplicando o simplex '''
 max_min = input("Digite 1 para maximização e 0 para minimização:\n")
 if max_min == '1':
     fobjetivo = [i*-1 for i in fobjetivo]   # em caso de MAX Z, múltiplica-se por -1 para fazer MIN Z
-while(question != 'f'):
+while(1):
     nova_base = entra_base(fobjetivo)
     if nova_base < 0:
-        print("Sem mais variáveis candidatas a entrar na base.") # solução ótima, ou não há solução
+        print("Solução ótima.") # solução ótima, ou não há solução
+
+        if max_min == '1':
+            print("Z =", fobjetivo[len(fobjetivo)-1])   # valor de Z ótimo
+
+        if max_min == '0':
+            print("Z =", fobjetivo[len(fobjetivo)-1]*-1)
+
+        n = 0
+        for i in range(len(fobjetivo)):
+            if fobjetivo[i] == 0.0:
+                n+=1
+        if n > len(matriz):
+            print("Múltiplas soluções!\n")   # se houver uma variável não-básica valendo zero, existem múltiplas soluções
         break
 
     if teste(matriz, nova_base) < 0:
@@ -87,21 +99,5 @@ while(question != 'f'):
     
     troca_de_base(matriz, teste(matriz, nova_base), nova_base, fobjetivo)
     print_tablo(matriz, fobjetivo)
-
-    question = input("continuar: 's', parar: 'f'.\n") # o usuário pode decidir se a solução é ótima ao ver o tablô
-
-if question == 'f' and entra_base(fobjetivo) < 0:
-    if max_min == '1':
-        print("Z =", fobjetivo[len(fobjetivo)-1])   # valor de Z ótimo
-    if max_min == '0':
-        print("Z =", fobjetivo[len(fobjetivo)-1]*-1)
-
-n = 0
-for i in range(len(fobjetivo)):
-    if fobjetivo[i] == 0.0:
-        n+=1
-
-if n > len(matriz) and question == 'f': # em caso de solução ótima
-    print("\nMúltiplas soluções!")      # se houver uma variável não-básica valendo zero, existem múltiplas soluções
 
 input("Pressione ENTER para encerrar.")
